@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>New page</title>
+    <link href="css/normalize.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+<h1>Accounts Dashboard</h1>
+<p><br></p>
+<h3>Add Account</h3>
+<p><br></p>
+<form id="addForm">
+    <br>
+    <label class="">Name : </label>
+    <input id="name" class="">
+    <br>
+    <label class="">Phone Number : </label>
+    <input id="phonenumber" class="">
+    <br>
+    <button>create</button>
+</form>
+
+<h3>All Accounts</h3>
+<table border="1" id="accountTable">
+    <!-- We will inject rows via javascript here -->
+</table>
+
+<script>
+    fetch('/account')
+        .then(res => res.json())
+        .then(accounts => {
+            let output = "<tr><th>ID</th><th>Name</th><th>Phone</th><th>Actions</th></tr>";
+
+            accounts.forEach(acc => {
+                output += `
+        <tr>
+          <td>${acc.id}</td>
+          <td>${acc.name}</td>
+          <td>${acc.phoneNumber}</td>
+          <td>
+            <button onclick="updateAcc(${acc.id}, '${(acc.name || '').replace(/'/g, "\\'")}', '${(acc.phoneNumber || '').replace(/'/g, "\\'")}')">Update</button>
+            <button onclick="del(${acc.id})">Delete</button>
+          </td>
+        </tr>
+      `;
+            });
+
+            document.getElementById('accountTable').innerHTML = output;
+        });
+
+    document.getElementById('addForm').onsubmit = (event) =>
+    {
+        fetch('/account',
+            {
+                method:'POST',
+                headers: { "Content-Type": "application/json"},
+                body: JSON.stringify({
+                    "name": document.getElementById('name').value,
+                    "phoneNumber":document.getElementById('phonenumber').value
+
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            });
+    }
+</script>
+
+</body>
